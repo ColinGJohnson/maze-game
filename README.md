@@ -1,7 +1,11 @@
 # maze-game
 A JavaScript browser game in which the player successively completes increasingly difficult randomly generated mazes.
 
-# Future Features
+## Controls
+Arrow Keys - Move
+Space Bar - Start Game
+
+## Future Features
 - Move finish square to furthest square from start position
 - Show ideal route after finish
 - Show stats, ex: efficiency
