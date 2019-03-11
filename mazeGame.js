@@ -87,32 +87,32 @@ function update(delta) {
 	// if user in in-game
 	if (gameState == 1) {
 
-		// process input
-		if (Key.isDown(Key.RIGHT) && maze[playerPos.x + 1][playerPos.y] != -1) {
-			playerPos.x += 1;
-			maze[playerPos.x][playerPos.y] += colorRate;
-		}
-
-		if (Key.isDown(Key.LEFT) && maze[playerPos.x - 1][playerPos.y] != -1) {
-			playerPos.x -= 1;
-			maze[playerPos.x][playerPos.y] += colorRate;
-		}
-
-		if (Key.isDown(Key.DOWN) && maze[playerPos.x][playerPos.y + 1] != -1) {
-			playerPos.y += 1;
-			maze[playerPos.x][playerPos.y] += colorRate;
-		}
-
-		if (Key.isDown(Key.UP) && maze[playerPos.x][playerPos.y - 1] != -1) {
-			playerPos.y -= 1;
-			maze[playerPos.x][playerPos.y] += colorRate;
-		}
-
 		// check win conditions
-		if (playerPos.x == mazeSize - 2 && playerPos.y == mazeSize - 2) {
+		if (maze[playerPos.x][playerPos.y] == -2) {
 			gameState = 2;
 			mazeGenerated = false;
 			gameEndTimestamp = (new Date).getTime();
+		}
+
+		// process input
+		if (Key.isDown(Key.RIGHT) && maze[playerPos.x + 1][playerPos.y] != -1) {
+			maze[playerPos.x][playerPos.y] += colorRate;
+			playerPos.x += 1;
+		}
+
+		if (Key.isDown(Key.LEFT) && maze[playerPos.x - 1][playerPos.y] != -1) {
+			maze[playerPos.x][playerPos.y] += colorRate;
+			playerPos.x -= 1;
+		}
+
+		if (Key.isDown(Key.DOWN) && maze[playerPos.x][playerPos.y + 1] != -1) {
+			maze[playerPos.x][playerPos.y] += colorRate;
+			playerPos.y += 1;
+		}
+
+		if (Key.isDown(Key.UP) && maze[playerPos.x][playerPos.y - 1] != -1) {
+			maze[playerPos.x][playerPos.y] += colorRate;
+			playerPos.y -= 1;
 		}
 
 	// otherwise user has not yet started the game
@@ -183,11 +183,15 @@ function render() {
 	// fill maze squares
 	for (var x = 0; x < maze.length; x++) {
 		for (var y = 0; y < maze.length; y++) {
-			if (maze[x][y] > -1) {
+			if (maze[x][y] != -1) {
 
 				// fill with white if unvisited
-				if (maze[x][y] == 0){
+				if (maze[x][y] == 0) {
 					ctx.fillStyle = "white";
+
+				// cycle colors if this is the goal cell
+				} else if (maze[x][y] == -2) {
+					ctx.fillStyle = "hsl(" + (Date.now() / 10) % 360 + ", 90%, 50%)"
 
 				// otherwise dynamically color
 				} else {
@@ -207,14 +211,6 @@ function render() {
 
 	// if game has been started at least once
 	if (gameState > 0) {
-		
-		// draw color cycling finish square
-		ctx.fillStyle = "hsl(" + (Date.now() / 10) % 360 + ", 90%, 50%)"
-		var topLeft = {
-			x: centerX - gridWidthPx / 2 + cellWidthPx * (mazeSize - 2), 
-			y: centerY - gridWidthPx / 2 + cellWidthPx * (mazeSize - 2)
-		};
-		ctx.fillRect(topLeft.x, topLeft.y, cellWidthPx, cellWidthPx);
 
 		// draw player square
 		ctx.fillStyle = "grey";
@@ -312,6 +308,9 @@ function generate(mazeSize) {
 	// start at 1,1
 	var genStack = [{x: 1, y: 1}];
 
+	var furthestCell = {x: 1, y: 1};
+	var maxStack = 0;
+
 	// continute generating until backtracking is complete
 	while (genStack.length > 0) {
 		
@@ -320,6 +319,12 @@ function generate(mazeSize) {
 
 		// mark current cell as visited (0) in mazeArray
 		mazeArray[current.x][current.y] = 0;
+
+		// check if this is the new furthest cell from 1,1
+		if (genStack.length > maxStack) {
+			furthestCell = current;
+			maxStack = genStack.length;
+		} 
 
 		// mark cell between current and last as visited (0)
 		if (genStack.length > 1) {
@@ -354,6 +359,9 @@ function generate(mazeSize) {
 			genStack.pop();
 		}
 	}
+
+	// mark the furthest cell from (1,1), which will be the goal
+	mazeArray[furthestCell.x][furthestCell.y] = -2
 
 	return mazeArray
 }
