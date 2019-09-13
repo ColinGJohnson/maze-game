@@ -8,12 +8,15 @@ var	lastStamp = 0;
 var	gameState = 0; // 0 = start, 1 = in-game, 2 = finished
 
 // maze representation
-var	mazeSize = 21;
+var	mazeSize = 11;
 var colorRate = 30;
 var	maze = [];
 var	mazeGenerated = false;
 
-// game stats variables
+// number of Mazes that have been completed so far
+var numGames = 0
+
+// Game stats
 var gameStartTimestamp = 0;
 var gameEndTimestamp = 0;
 
@@ -92,6 +95,7 @@ function update(delta) {
 			gameState = 2;
 			mazeGenerated = false;
 			gameEndTimestamp = (new Date).getTime();
+			numGames += 1;
 		}
 
 		// process input
@@ -121,7 +125,12 @@ function update(delta) {
 		// start game if space is pressed
 		if(Key.isDown([Key.SPACE])) {
 
-			// generate maze if nessesary
+			// increase the maze size after before every game but the first
+			if (numGames > 0) {
+				mazeSize += 2;
+			}
+
+			// generate maze if necessary
 			if (!mazeGenerated) {
 				maze = generate(mazeSize);
 			}
