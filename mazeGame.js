@@ -1,27 +1,44 @@
+/*
+"Maze Game" is a vanilla javascript browser game about solving mazes.
+Copyright (C) 2020  Colin Johnson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 // player
-var	playerPos = {x: 1, y: 1};
-var	movementOptions = {up: false, down: false, left: false, right: false};
+let playerPos = {x: 1, y: 1};
+let movementOptions = {up: false, down: false, left: false, right: false};
 
 // loop mechanics
-var	lastStamp = 0;
-var	gameState = 0; // 0 = start, 1 = in-game, 2 = finished
+let lastStamp = 0;
+let gameState = 0; // 0 = start, 1 = in-game, 2 = finished
 
 // maze representation
-var	mazeSize = 11;
-var colorRate = 30;
-var	maze = [];
-var	mazeGenerated = false;
+let mazeSize = 11;
+let colorRate = 30;
+let maze = [];
+let mazeGenerated = false;
 
 // number of Mazes that have been completed so far
-var numGames = 0
+let numGames = 0
 
 // Game stats
-var gameStartTimestamp = 0;
-var gameEndTimestamp = 0;
+let gameStartTimestamp = 0;
+let gameEndTimestamp = 0;
 
 // object to store keyboard information
-var Key = {
+let Key = {
     _pressed: {},
     _typed: {},
 
@@ -154,7 +171,7 @@ function update(delta) {
 function render() {
 
 	// get the canvas
-	var canvas = document.getElementById("mainCanvas");
+	let canvas = document.getElementById("mainCanvas");
 	ctx = canvas.getContext("2d");
 
 	// resize the canvas
@@ -162,10 +179,10 @@ function render() {
 	canvas.width = window.innerWidth;
 
 	// update dimensions
-	var centerX = canvas.width / 2;
-	var centerY = canvas.height / 2;
-	var gridWidthPx = (canvas.height < canvas.width) ? canvas.height * 0.70: canvas.width * 0.70;
-	var cellWidthPx = gridWidthPx / mazeSize;
+	let centerX = canvas.width / 2;
+	let centerY = canvas.height / 2;
+	let gridWidthPx = (canvas.height < canvas.width) ? canvas.height * 0.70: canvas.width * 0.70;
+	let cellWidthPx = gridWidthPx / mazeSize;
 
 	// draw black background
 	ctx.fillStyle = "black";
@@ -174,24 +191,24 @@ function render() {
 	// draw maze grid
 	ctx.strokeStyle = "grey";
 	ctx.lineWidth = 1;
-	for (var i = 0; i < mazeSize + 1; i++) {
+	for (let i = 0; i < mazeSize + 1; i++) {
 		
 		// draw horizontal lines
-		var y = Math.round((centerY - gridWidthPx / 2) + i * cellWidthPx) + 0.5;
+		let y = Math.round((centerY - gridWidthPx / 2) + i * cellWidthPx) + 0.5;
 		ctx.moveTo(centerX - gridWidthPx / 2, y);
 		ctx.lineTo(centerX + gridWidthPx / 2, y)
 		ctx.stroke();
 
 		// draw vertical lines
-		var x = Math.round((centerX - gridWidthPx / 2) + i * cellWidthPx) + 0.5;
+		let x = Math.round((centerX - gridWidthPx / 2) + i * cellWidthPx) + 0.5;
 		ctx.moveTo(x, centerY - gridWidthPx / 2);
 		ctx.lineTo(x, centerY + gridWidthPx / 2);
 		ctx.stroke();
 	}
 
 	// fill maze squares
-	for (var x = 0; x < maze.length; x++) {
-		for (var y = 0; y < maze.length; y++) {
+	for (let x = 0; x < maze.length; x++) {
+		for (let y = 0; y < maze.length; y++) {
 			if (maze[x][y] != -1) {
 
 				// fill with white if unvisited
@@ -204,12 +221,12 @@ function render() {
 
 				// otherwise dynamically color
 				} else {
-					var hue = 150 - maze[x][y]
+					let hue = 150 - maze[x][y]
 					hue = (hue < 0) ? 0: hue
 					ctx.fillStyle = "hsl(" + hue + ", 90%, 50%)"
 				}
 				
-				var topLeft = {
+				let topLeft = {
 					x: centerX - gridWidthPx / 2 + x * cellWidthPx, 
 					y: centerY - gridWidthPx / 2 + y * cellWidthPx
 				};
@@ -245,8 +262,8 @@ function render() {
 		// draw timer
 		ctx.font = ("30px Courier New");
 		ctx.fillStyle  = "white";
-		var currentTimeMs = (new Date).getTime();
-		var secondsPassed = (currentTimeMs - gameStartTimestamp) / 1000
+		let currentTimeMs = (new Date).getTime();
+		let secondsPassed = (currentTimeMs - gameStartTimestamp) / 1000
 		ctx.fillText(secondsPassed.toFixed(2) + "s", 30, 60);
 	}
 
@@ -256,7 +273,7 @@ function render() {
 		// draw time taken
 		ctx.font = ("30px Courier New");
 		ctx.fillStyle  = "green";
-		var secondsPassed = (gameEndTimestamp - gameStartTimestamp) / 1000
+		let secondsPassed = (gameEndTimestamp - gameStartTimestamp) / 1000
 		ctx.fillText("Finished in " + secondsPassed.toFixed(2) + "s", 30, 60);
 	}
 } // end of function "render()"
@@ -280,15 +297,15 @@ function newMaze(mazeSize) {
 function generate(mazeSize) {
 
 	// clear the maze
-	var mazeArray = newMaze(mazeSize);
+	let mazeArray = newMaze(mazeSize);
 
 	/* 
 	* function to randomly select a coordinate to proceed to given a partially completed
 	* maze and a coordinate to proceed from
 	*/
 	chooseNext = function(mazeArray, x, y) {
-		var options = [];
-		var jumpDist = 2
+		let options = [];
+		let jumpDist = 2
 
 		// up
 		if (y > jumpDist && mazeArray[x][y - jumpDist] == -1) {
@@ -315,16 +332,16 @@ function generate(mazeSize) {
 	}
 
 	// start at 1,1
-	var genStack = [{x: 1, y: 1}];
+	let genStack = [{x: 1, y: 1}];
 
-	var furthestCell = {x: 1, y: 1};
-	var maxStack = 0;
+	let furthestCell = {x: 1, y: 1};
+	let maxStack = 0;
 
 	// continute generating until backtracking is complete
 	while (genStack.length > 0) {
 		
 		// get current cell by peeking stack
-		var current = genStack[genStack.length - 1]
+		let current = genStack[genStack.length - 1]
 
 		// mark current cell as visited (0) in mazeArray
 		mazeArray[current.x][current.y] = 0;
@@ -337,7 +354,7 @@ function generate(mazeSize) {
 
 		// mark cell between current and last as visited (0)
 		if (genStack.length > 1) {
-			var previous = genStack[genStack.length - 2]
+			let previous = genStack[genStack.length - 2]
 
 			// from left to right
 			if (current.x > previous.x) {
@@ -358,7 +375,7 @@ function generate(mazeSize) {
 		}
 
 		// proceed to an adjacent unvisited cell if one exists
-		var next = chooseNext(mazeArray, current.x, current.y);
+		let next = chooseNext(mazeArray, current.x, current.y);
 
 		if (next) {
 			genStack.push(next);
