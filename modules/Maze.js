@@ -1,4 +1,3 @@
-
 /**
  * A square maze.
  */
@@ -44,7 +43,7 @@ export default class Maze {
          * @param y
          * @returns {undefined|*}
          */
-        let chooseNext = function(mazeArray, x, y) {
+        let chooseNext = function (mazeArray, x, y) {
             let options = [];
             let jumpDist = 2
 
@@ -101,15 +100,15 @@ export default class Maze {
                 if (current.x > previous.x) {
                     mazeArray[current.x - 1][current.y] = 0;
 
-                // from right to left
+                    // from right to left
                 } else if (current.x < previous.x) {
                     mazeArray[current.x + 1][current.y] = 0;
 
-                // from above to below
+                    // from above to below
                 } else if (current.y > previous.y) {
                     mazeArray[current.x][current.y - 1] = 0;
 
-                // from below to above
+                    // from below to above
                 } else {
                     mazeArray[current.x][current.y + 1] = 0;
                 }
@@ -120,7 +119,7 @@ export default class Maze {
             if (next) {
                 genStack.push(next);
 
-            // otherwise backtrack
+                // otherwise backtrack
             } else {
                 genStack.pop();
             }

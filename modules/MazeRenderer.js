@@ -1,4 +1,3 @@
-
 /**
  * Manages drawing a square maze on a HTML Canvas element.
  */
@@ -19,7 +18,7 @@ export default class MazeRenderer {
      *
      * @param {MazeGame} mazeGame the MazeGame to draw.
      */
-    updateDimensions(mazeGame)  {
+    updateDimensions(mazeGame) {
 
         // resize the canvas
         this.canvas.height = window.innerHeight;
@@ -28,7 +27,7 @@ export default class MazeRenderer {
         // get canvas dimensions
         this.centerX = this.canvas.width / 2;
         this.centerY = this.canvas.height / 2;
-        this.gridWidthPx = (this.canvas.height < this.canvas.width) ? this.canvas.height * 0.70: this.canvas.width * 0.70;
+        this.gridWidthPx = (this.canvas.height < this.canvas.width) ? this.canvas.height * 0.70 : this.canvas.width * 0.70;
         this.cellWidthPx = this.gridWidthPx / mazeGame.maze.size;
     }
 
@@ -76,14 +75,14 @@ export default class MazeRenderer {
                     if (maze.get(x, y) === 0) {
                         this.ctx.fillStyle = "white";
 
-                    // cycle colors if this is the goal cell
+                        // cycle colors if this is the goal cell
                     } else if (maze.get(x, y) === -2) {
                         this.ctx.fillStyle = "hsl(" + (Date.now() / 10) % 360 + ", 90%, 50%)"
 
-                    // otherwise dynamically color
+                        // otherwise dynamically color
                     } else {
                         let hue = 150 - maze.get(x, y) * this.colorRate;
-                        hue = (hue < 0) ? 0: hue
+                        hue = (hue < 0) ? 0 : hue
                         this.ctx.fillStyle = "hsl(" + hue + ", 90%, 50%)"
                     }
 
@@ -115,7 +114,7 @@ export default class MazeRenderer {
 
             // draw instructions
             this.ctx.font = ("30px Courier New");
-            this.ctx.fillStyle  = "white";
+            this.ctx.fillStyle = "white";
             this.ctx.fillText("SPACE to start. Arrow keys to move.", 30, 60);
         }
 
@@ -124,7 +123,7 @@ export default class MazeRenderer {
 
             // draw timer
             this.ctx.font = ("30px Courier New");
-            this.ctx.fillStyle  = "white";
+            this.ctx.fillStyle = "white";
             let currentTimeMs = (new Date).getTime();
             let secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000
             this.ctx.fillText(secondsPassed.toFixed(2) + "s", 30, 60);
@@ -135,7 +134,7 @@ export default class MazeRenderer {
 
             // draw time taken
             this.ctx.font = ("30px Courier New");
-            this.ctx.fillStyle  = "green";
+            this.ctx.fillStyle = "green";
             let secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000
             this.ctx.fillText("Finished in " + secondsPassed.toFixed(2) + "s", 30, 60);
         }
