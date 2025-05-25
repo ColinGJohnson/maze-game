@@ -1,3 +1,5 @@
+import {GameState} from "./MazeGame.js";
+
 /**
  * Manages drawing a square maze on a HTML Canvas element.
  */
@@ -32,7 +34,7 @@ export default class MazeRenderer {
     }
 
     /**
-     * Draws a maze on the canvas associated with this mazerenderer.
+     * Draws a maze on the canvas associated with this MazeRenderer.
      *
      * @param {MazeGame} mazeGame the MazeGame to draw.
      */
@@ -97,7 +99,7 @@ export default class MazeRenderer {
         }
 
         // if game has been started at least once
-        if (mazeGame.gameState > 0) {
+        if (mazeGame.gameState !== GameState.START) {
             let player = mazeGame.player;
 
             // draw player square
@@ -109,17 +111,14 @@ export default class MazeRenderer {
             this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
         }
 
-        // if on start screen
-        if (mazeGame.gameState === 0) {
+        if (mazeGame.gameState === GameState.START) {
 
             // draw instructions
             this.ctx.font = ("30px sans-serif");
             this.ctx.fillStyle = "white";
             this.ctx.fillText("Press SPACE to start and use the arrow keys to move.", 30, 60);
-        }
 
-        // if in game
-        if (mazeGame.gameState === 1) {
+        } else if (mazeGame.gameState === GameState.IN_GAME) {
 
             // draw timer
             this.ctx.font = ("30px sans-serif");
@@ -127,10 +126,8 @@ export default class MazeRenderer {
             let currentTimeMs = (new Date).getTime();
             let secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000
             this.ctx.fillText(secondsPassed.toFixed(2) + "s", 30, 60);
-        }
 
-        // if on win screen
-        if (mazeGame.gameState === 2) {
+        } else if (mazeGame.gameState === GameState.END) {
 
             // draw time taken
             this.ctx.font = ("30px sans-serif");

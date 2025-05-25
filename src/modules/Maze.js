@@ -20,6 +20,13 @@ export default class Maze {
         this.maze[player.x][player.y] += 1;
     }
 
+    /**
+     * Retrieves the value from the maze at the specified coordinates.
+     *
+     * @param {number} x - The x-coordinate within the maze.
+     * @param {number} y - The y-coordinate within the maze.
+     * @return {*} The value at the specified coordinates in the maze.
+     */
     get(x, y) {
         return this.maze[x][y];
     }
