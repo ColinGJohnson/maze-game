@@ -12,3 +12,21 @@ html, body {
   display: block;
   background-color: black;
 }
+
+#github-logo {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 16px;
+
+  img {
+    transition: filter 0.1s ease;
+    width: 48px;
+  }
+
+  img:hover {
+    transition: filter 0.1s ease;
+    width: 48px;
+    filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.8));
+  }
+}
