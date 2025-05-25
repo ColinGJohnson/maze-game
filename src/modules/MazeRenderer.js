@@ -113,16 +113,16 @@ export default class MazeRenderer {
         if (mazeGame.gameState === 0) {
 
             // draw instructions
-            this.ctx.font = ("30px Courier New");
+            this.ctx.font = ("30px sans-serif");
             this.ctx.fillStyle = "white";
-            this.ctx.fillText("SPACE to start. Arrow keys to move.", 30, 60);
+            this.ctx.fillText("Press SPACE to start and use the arrow keys to move.", 30, 60);
         }
 
         // if in game
         if (mazeGame.gameState === 1) {
 
             // draw timer
-            this.ctx.font = ("30px Courier New");
+            this.ctx.font = ("30px sans-serif");
             this.ctx.fillStyle = "white";
             let currentTimeMs = (new Date).getTime();
             let secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000
@@ -133,11 +133,10 @@ export default class MazeRenderer {
         if (mazeGame.gameState === 2) {
 
             // draw time taken
-            this.ctx.font = ("30px Courier New");
-            this.ctx.fillStyle = "green";
+            this.ctx.font = ("30px sans-serif");
+            this.ctx.fillStyle = "lime";
             let secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000
             this.ctx.fillText("Finished in " + secondsPassed.toFixed(2) + "s", 30, 60);
         }
     }
 }
-
