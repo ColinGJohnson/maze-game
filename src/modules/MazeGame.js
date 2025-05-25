@@ -3,6 +3,7 @@
 import Maze from "./Maze.js";
 import MazeRenderer from "./MazeRenderer.js";
 import Player from "./Player.js";
+import InputHandler from "./InputHandler.js";
 
 export const GameState = Object.freeze({
     START: 0,
@@ -17,45 +18,14 @@ export default class MazeGame {
     gameStartTimestamp = 0;
     gameEndTimestamp = 0;
 
-    // maze representation
-    maze = new Maze(11);
+    // Maze representation
+    maze = new Maze(21);
     mazeRenderer = new MazeRenderer("maze-canvas");
     player = new Player();
-
-    // object to store keyboard information
-    Key = {
-        _pressed: {},
-
-        UP: 38,
-        DOWN: 40,
-        LEFT: 37,
-        RIGHT: 39,
-        SPACE: 32,
-
-        isDown: function (keyCode) {
-            return this._pressed[keyCode];
-        },
-
-        onKeydown: function (event) {
-            this._pressed[event.keyCode] = true;
-        },
-
-        onKeyup: function (event) {
-            delete this._pressed[event.keyCode];
-        }
-    };
+    inputHandler = new InputHandler();
 
     constructor() {
-
-        // keyboard event listeners to modify 'Key' object
-        window.addEventListener('keyup', (event) => {
-            this.Key.onKeyup(event);
-        }, false);
-        window.addEventListener('keydown', (event) => {
-            this.Key.onKeydown(event);
-        }, false);
-
-        // start the game loop
+        // Start the game loop
         window.requestAnimationFrame(() => this.step());
     }
 
@@ -77,51 +47,48 @@ export default class MazeGame {
      * Updates the game menu state and prepares the game to start or continue.
      */
     updateMenu() {
-
         // Do nothing until the user requests to start the game
-        if (!this.Key.isDown([this.Key.SPACE])) {
-            return
+        if (!this.inputHandler.isDown(this.inputHandler.SPACE)) {
+            return;
         }
 
-        // increase the maze size after before every game but the first
+        // Increase the maze size before every game but the first
         if (this.player.mazesCompleted > 0) {
             this.maze = new Maze(this.maze.size + 2);
         }
 
-        // reset player position
+        // Reset player position
         this.player.resetPosition();
 
-        // let the player move
+        // Let the player move
         this.gameState = GameState.IN_GAME;
 
-        // record the start time
-        this.gameStartTimestamp = (new Date).getTime();
+        // Record the start time
+        this.gameStartTimestamp = (new Date()).getTime();
     }
 
     /**
      * Updates the game state by checking win conditions, processing player movement, and handling input.
      */
     updateGame() {
-
-        // check win conditions
+        // Check win conditions
         if (this.maze.get(this.player.x, this.player.y) === -2) {
             this.gameState = GameState.END;
-            this.gameEndTimestamp = (new Date).getTime();
+            this.gameEndTimestamp = (new Date()).getTime();
             this.player.mazesCompleted += 1;
         }
 
-        let tryMove = (xOffset, yOffset) => {
+        const tryMove = (xOffset, yOffset) => {
             if (this.maze.get(this.player.x + xOffset, this.player.y + yOffset) !== -1) {
-                this.maze.visit(this.player)
+                this.maze.visit(this.player);
                 this.player.x += xOffset;
                 this.player.y += yOffset;
             }
-        }
+        };
 
-        // process input
-        if (this.Key.isDown(this.Key.RIGHT)) tryMove(1, 0);
-        if (this.Key.isDown(this.Key.LEFT)) tryMove(-1, 0);
-        if (this.Key.isDown(this.Key.DOWN)) tryMove(0, 1);
-        if (this.Key.isDown(this.Key.UP)) tryMove(0, -1);
+        if (this.inputHandler.isDown(this.inputHandler.RIGHT)) tryMove(1, 0);
+        if (this.inputHandler.isDown(this.inputHandler.LEFT)) tryMove(-1, 0);
+        if (this.inputHandler.isDown(this.inputHandler.DOWN)) tryMove(0, 1);
+        if (this.inputHandler.isDown(this.inputHandler.UP)) tryMove(0, -1);
     }
 }
