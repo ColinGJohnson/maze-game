@@ -1,5 +1,3 @@
-'use strict';
-
 import Maze from "./Maze.js";
 import MazeRenderer from "./MazeRenderer.js";
 import Player from "./Player.js";
@@ -19,7 +17,7 @@ export default class MazeGame {
     gameEndTimestamp = 0;
 
     // Maze representation
-    maze = new Maze(21);
+    maze = new Maze(51);
     mazeRenderer = new MazeRenderer("maze-canvas");
     player = new Player();
     inputHandler = new InputHandler();

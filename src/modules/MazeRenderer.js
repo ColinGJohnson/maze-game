@@ -30,7 +30,7 @@ export default class MazeRenderer {
         this.centerX = this.canvas.width / 2;
         this.centerY = this.canvas.height / 2;
         this.gridWidthPx = (this.canvas.height < this.canvas.width) ? this.canvas.height * 0.70 : this.canvas.width * 0.70;
-        this.cellWidthPx = this.gridWidthPx / mazeGame.maze.size;
+        this.cellWidthPx = Math.ceil(this.gridWidthPx / mazeGame.maze.size);
     }
 
     /**
@@ -49,24 +49,8 @@ export default class MazeRenderer {
 
         // draw maze grid
         let maze = mazeGame.maze;
-        let mazeSize = maze.size;
         this.ctx.strokeStyle = "grey";
         this.ctx.lineWidth = 1;
-
-        for (let i = 0; i < mazeSize + 1; i++) {
-
-            // draw horizontal lines
-            let y = Math.round((this.centerY - this.gridWidthPx / 2) + i * this.cellWidthPx) + 0.5;
-            this.ctx.moveTo(this.centerX - this.gridWidthPx / 2, y);
-            this.ctx.lineTo(this.centerX + this.gridWidthPx / 2, y)
-            this.ctx.stroke();
-
-            // draw vertical lines
-            let x = Math.round((this.centerX - this.gridWidthPx / 2) + i * this.cellWidthPx) + 0.5;
-            this.ctx.moveTo(x, this.centerY - this.gridWidthPx / 2);
-            this.ctx.lineTo(x, this.centerY + this.gridWidthPx / 2);
-            this.ctx.stroke();
-        }
 
         // fill maze squares
         for (let x = 0; x < maze.size; x++) {
@@ -89,8 +73,8 @@ export default class MazeRenderer {
                     }
 
                     let topLeft = {
-                        x: this.centerX - this.gridWidthPx / 2 + x * this.cellWidthPx,
-                        y: this.centerY - this.gridWidthPx / 2 + y * this.cellWidthPx
+                        x: Math.ceil(this.centerX - this.gridWidthPx / 2 + x * this.cellWidthPx),
+                        y: Math.ceil(this.centerY - this.gridWidthPx / 2 + y * this.cellWidthPx)
                     };
 
                     this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
@@ -105,8 +89,8 @@ export default class MazeRenderer {
             // draw player square
             this.ctx.fillStyle = "grey";
             let topLeft = {
-                x: this.centerX - this.gridWidthPx / 2 + player.x * this.cellWidthPx,
-                y: this.centerY - this.gridWidthPx / 2 + player.y * this.cellWidthPx
+                x: Math.ceil(this.centerX - this.gridWidthPx / 2 + player.x * this.cellWidthPx),
+                y: Math.ceil(this.centerY - this.gridWidthPx / 2 + player.y * this.cellWidthPx)
             };
             this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
         }
@@ -133,7 +117,7 @@ export default class MazeRenderer {
             this.ctx.font = ("30px sans-serif");
             this.ctx.fillStyle = "lime";
             let secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000
-            this.ctx.fillText("Finished in " + secondsPassed.toFixed(2) + "s", 30, 60);
+            this.ctx.fillText("Finished in " + secondsPassed.toFixed(2) + "s", this.centerX - this.gridWidthPx / 2, this.centerY - this.gridWidthPx / 2);
         }
     }
 }
