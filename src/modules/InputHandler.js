@@ -21,11 +21,16 @@ export default class InputHandler {
     return !!this._pressed[keyCode];
   }
 
+  reset() {
+    this._pressed = {};
+  }
+
   /**
    * Handle keydown event
    * @param {KeyboardEvent} event
    */
   onKeydown(event) {
+    if (event.repeat) return;
     this._pressed[event.keyCode] = true;
   }
 

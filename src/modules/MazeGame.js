@@ -1,4 +1,4 @@
-import Maze from "./Maze.js";
+import Maze, { WALL } from "./Maze.js";
 import MazeRenderer from "./MazeRenderer.js";
 import Player from "./Player.js";
 import InputHandler from "./InputHandler.js";
@@ -55,13 +55,8 @@ export default class MazeGame {
       this.maze = new Maze(this.maze.size + 2);
     }
 
-    // Reset player position
     this.player.resetPosition();
-
-    // Let the player move
     this.gameState = GameState.IN_GAME;
-
-    // Record the start time
     this.gameStartTimestamp = new Date().getTime();
   }
 
@@ -76,13 +71,19 @@ export default class MazeGame {
       this.player.mazesCompleted += 1;
     }
 
-    const tryMove = (xOffset, yOffset) => {
-      while (
-        this.maze.get(this.player.x + xOffset, this.player.y + yOffset) !== -1
-      ) {
+    const tryMove = (x, y) => {
+      while (this.maze.get(this.player.x + x, this.player.y + y) !== WALL) {
         this.maze.visit(this.player);
-        this.player.x += xOffset;
-        this.player.y += yOffset;
+
+        this.player.x += x;
+        this.player.y += y;
+
+        const openLeft = this.maze.get(this.player.x + y, this.player.y + x) !== WALL;
+        const openRight = this.maze.get(this.player.x - y, this.player.y - x) !== WALL;
+
+        if (openLeft || openRight) {
+          break;
+        }
       }
     };
 
@@ -90,5 +91,7 @@ export default class MazeGame {
     if (this.inputHandler.isDown(this.inputHandler.LEFT)) tryMove(-1, 0);
     if (this.inputHandler.isDown(this.inputHandler.DOWN)) tryMove(0, 1);
     if (this.inputHandler.isDown(this.inputHandler.UP)) tryMove(0, -1);
+
+    this.inputHandler.reset();
   }
 }

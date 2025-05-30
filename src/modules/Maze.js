@@ -1,3 +1,6 @@
+export const WALL = -1;
+export const GOAL = -2;
+
 /**
  * A square maze.
  */
@@ -56,24 +59,24 @@ export default class Maze {
       let jumpDist = 2;
 
       // up
-      if (y > jumpDist && mazeArray[x][y - jumpDist] === -1) {
+      if (y > jumpDist && mazeArray[x][y - jumpDist] === WALL) {
         options.push({ x: x, y: y - jumpDist });
       }
 
       // down
-      if (y < mazeArray.length - 1 && mazeArray[x][y + jumpDist] === -1) {
+      if (y < mazeArray.length - 1 && mazeArray[x][y + jumpDist] === WALL) {
         options.push({ x: x, y: y + jumpDist });
       }
 
       // left
-      if (x > jumpDist && mazeArray[x - jumpDist][y] === -1) {
+      if (x > jumpDist && mazeArray[x - jumpDist][y] === WALL) {
         options.push({ x: x - jumpDist, y: y });
       }
 
       // right
       if (
         x < mazeArray.length - jumpDist &&
-        mazeArray[x + jumpDist][y] === -1
+        mazeArray[x + jumpDist][y] === WALL
       ) {
         options.push({ x: x + jumpDist, y: y });
       }
