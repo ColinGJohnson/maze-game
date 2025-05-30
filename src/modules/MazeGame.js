@@ -77,7 +77,7 @@ export default class MazeGame {
     }
 
     const tryMove = (xOffset, yOffset) => {
-      if (
+      while (
         this.maze.get(this.player.x + xOffset, this.player.y + yOffset) !== -1
       ) {
         this.maze.visit(this.player);
