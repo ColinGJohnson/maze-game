@@ -12,6 +12,7 @@ export default class MazeRenderer {
    */
   constructor(canvasID) {
     this.canvas = document.getElementById(canvasID);
+    this.text = document.getElementById("game-text");
     this.ctx = this.canvas.getContext("2d");
   }
 
@@ -21,18 +22,16 @@ export default class MazeRenderer {
    * @param {MazeGame} mazeGame the MazeGame to draw.
    */
   updateDimensions(mazeGame) {
-    // resize the canvas
-    this.canvas.height = window.innerHeight;
-    this.canvas.width = window.innerWidth;
+    const container = document.querySelector(".maze-container");
 
-    // get canvas dimensions
-    this.centerX = this.canvas.width / 2;
-    this.centerY = this.canvas.height / 2;
-    this.gridWidthPx =
-      this.canvas.height < this.canvas.width
-        ? this.canvas.height * 0.7
-        : this.canvas.width * 0.7;
-    this.cellWidthPx = Math.ceil(this.gridWidthPx / mazeGame.maze.size);
+    this.cellWidthPx = Math.round(container.clientWidth / mazeGame.maze.size);
+    const size = this.cellWidthPx * mazeGame.maze.size;
+    this.canvas.width = size;
+    this.canvas.height = size;
+
+    this.canvas.style.borderRadius = this.cellWidthPx + "px";
+    this.canvas.style.borderWidth = this.cellWidthPx / 2 + "px";
+    this.text.style.fontSize = size / 25 + "px";
   }
 
   /**
@@ -63,8 +62,7 @@ export default class MazeRenderer {
 
             // cycle colors if this is the goal cell
           } else if (maze.get(x, y) === -2) {
-            this.ctx.fillStyle =
-              "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
+            this.ctx.fillStyle = "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
 
             // otherwise dynamically color
           } else {
@@ -74,20 +72,11 @@ export default class MazeRenderer {
           }
 
           let topLeft = {
-            x: Math.ceil(
-              this.centerX - this.gridWidthPx / 2 + x * this.cellWidthPx,
-            ),
-            y: Math.ceil(
-              this.centerY - this.gridWidthPx / 2 + y * this.cellWidthPx,
-            ),
+            x: Math.round(x * this.cellWidthPx),
+            y: Math.round(y * this.cellWidthPx),
           };
 
-          this.ctx.fillRect(
-            topLeft.x,
-            topLeft.y,
-            this.cellWidthPx,
-            this.cellWidthPx,
-          );
+          this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
         }
       }
     }
@@ -99,48 +88,27 @@ export default class MazeRenderer {
       // draw player square
       this.ctx.fillStyle = "grey";
       let topLeft = {
-        x: Math.ceil(
-          this.centerX - this.gridWidthPx / 2 + player.x * this.cellWidthPx,
-        ),
-        y: Math.ceil(
-          this.centerY - this.gridWidthPx / 2 + player.y * this.cellWidthPx,
-        ),
+        x: Math.round(player.x * this.cellWidthPx),
+        y: Math.round(player.y * this.cellWidthPx),
       };
-      this.ctx.fillRect(
-        topLeft.x,
-        topLeft.y,
-        this.cellWidthPx,
-        this.cellWidthPx,
-      );
+      this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
     }
 
     if (mazeGame.gameState === GameState.START) {
       // draw instructions
-      this.ctx.font = "30px sans-serif";
       this.ctx.fillStyle = "white";
-      this.ctx.fillText(
-        "Press SPACE to start and use the arrow keys to move.",
-        30,
-        60,
-      );
+      this.text.innerText = "Press SPACE to start and use the arrow keys to move.";
     } else if (mazeGame.gameState === GameState.IN_GAME) {
       // draw timer
-      this.ctx.font = "30px sans-serif";
       this.ctx.fillStyle = "white";
       let currentTimeMs = new Date().getTime();
       let secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
-      this.ctx.fillText(secondsPassed.toFixed(2) + "s", 30, 60);
+      this.text.innerHTML = `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       // draw time taken
-      this.ctx.font = "30px sans-serif";
       this.ctx.fillStyle = "lime";
-      let secondsPassed =
-        (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      this.ctx.fillText(
-        "Finished in " + secondsPassed.toFixed(2) + "s",
-        this.centerX - this.gridWidthPx / 2,
-        this.centerY - this.gridWidthPx / 2,
-      );
+      let secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
+      this.text.innerText = "Finished in " + secondsPassed.toFixed(2) + "s";
     }
   }
 }

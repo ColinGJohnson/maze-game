@@ -17,8 +17,8 @@ export default class MazeGame {
   gameEndTimestamp = 0;
 
   // Maze representation
-  maze = new Maze(51);
-  mazeRenderer = new MazeRenderer("maze-canvas");
+  maze = new Maze(41);
+  mazeRenderer = new MazeRenderer("maze");
   player = new Player();
   inputHandler = new InputHandler();
 
