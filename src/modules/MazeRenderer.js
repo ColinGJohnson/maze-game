@@ -1,4 +1,5 @@
 import { GameState } from "./MazeGame.js";
+import { GOAL } from "./Maze.js";
 
 /**
  * Manages drawing a square maze on a HTML Canvas element.
@@ -58,10 +59,10 @@ export default class MazeRenderer {
         if (maze.get(x, y) !== -1) {
           // fill with white if unvisited
           if (maze.get(x, y) === 0) {
-            this.ctx.fillStyle = "white";
+            this.ctx.fillStyle = "#FAF9F6";
 
             // cycle colors if this is the goal cell
-          } else if (maze.get(x, y) === -2) {
+          } else if (maze.get(x, y) === GOAL) {
             this.ctx.fillStyle = "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
 
             // otherwise dynamically color
@@ -83,7 +84,7 @@ export default class MazeRenderer {
 
     // if game has been started at least once
     if (mazeGame.gameState !== GameState.START) {
-      let player = mazeGame.player;
+      const player = mazeGame.player;
 
       // draw player square
       this.ctx.fillStyle = "grey";
@@ -96,18 +97,15 @@ export default class MazeRenderer {
 
     if (mazeGame.gameState === GameState.START) {
       // draw instructions
-      this.ctx.fillStyle = "white";
       this.text.innerText = "Press SPACE to start and use the arrow keys to move.";
     } else if (mazeGame.gameState === GameState.IN_GAME) {
       // draw timer
-      this.ctx.fillStyle = "white";
-      let currentTimeMs = new Date().getTime();
-      let secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
+      const currentTimeMs = new Date().getTime();
+      const secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
       this.text.innerHTML = `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       // draw time taken
-      this.ctx.fillStyle = "lime";
-      let secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
+      const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
       this.text.innerText = "Finished in " + secondsPassed.toFixed(2) + "s";
     }
   }

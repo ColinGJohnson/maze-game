@@ -1,3 +1,5 @@
+import seedrandom from "seedrandom";
+
 export const WALL = -1;
 export const GOAL = -2;
 
@@ -10,6 +12,7 @@ export default class Maze {
 
   constructor(size) {
     this.size = size;
+    this.random = dailySeededRandom();
     this.maze = this.generate(this.size);
   }
 
@@ -41,9 +44,7 @@ export default class Maze {
    */
   generate(mazeSize) {
     // create new 2D array to store the maze and fill with -1's
-    let mazeArray = Array.from(Array(mazeSize), () =>
-      new Array(mazeSize).fill(-1),
-    );
+    let mazeArray = Array.from(Array(mazeSize), () => new Array(mazeSize).fill(WALL));
 
     /**
      * Randomly selects a coordinate to proceed to given a partially completed
@@ -54,7 +55,7 @@ export default class Maze {
      * @param y
      * @returns {undefined|*}
      */
-    let chooseNext = function (mazeArray, x, y) {
+    const chooseNext = (mazeArray, x, y) => {
       let options = [];
       let jumpDist = 2;
 
@@ -74,22 +75,19 @@ export default class Maze {
       }
 
       // right
-      if (
-        x < mazeArray.length - jumpDist &&
-        mazeArray[x + jumpDist][y] === WALL
-      ) {
+      if (x < mazeArray.length - jumpDist && mazeArray[x + jumpDist][y] === WALL) {
         options.push({ x: x + jumpDist, y: y });
       }
 
-      // return a random direction or undefined if no valid directions exist
-      return options.length === 0
-        ? undefined
-        : options[Math.floor(Math.random() * options.length)];
+      if (options.length === 0) {
+        return undefined;
+      } else {
+        return options[Math.floor(this.random.quick() * options.length)];
+      }
     };
 
     // start at 1,1
     let genStack = [{ x: 1, y: 1 }];
-
     let furthestCell = { x: 1, y: 1 };
     let maxStack = 0;
 
@@ -133,16 +131,20 @@ export default class Maze {
       let next = chooseNext(mazeArray, current.x, current.y);
       if (next) {
         genStack.push(next);
-
-        // otherwise backtrack
       } else {
         genStack.pop();
       }
     }
 
     // mark the furthest cell from (1,1), which will be the goal
-    mazeArray[furthestCell.x][furthestCell.y] = -2;
+    mazeArray[furthestCell.x][furthestCell.y] = GOAL;
 
     return mazeArray;
   }
+}
+
+function dailySeededRandom() {
+  const today = new Date();
+  const seed = today.toLocaleDateString("en-US", { timeZone: "UTC" });
+  return new seedrandom(seed);
 }

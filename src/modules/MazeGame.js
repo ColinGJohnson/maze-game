@@ -1,4 +1,4 @@
-import Maze, { WALL } from "./Maze.js";
+import Maze, { GOAL, WALL } from "./Maze.js";
 import MazeRenderer from "./MazeRenderer.js";
 import Player from "./Player.js";
 import InputHandler from "./InputHandler.js";
@@ -17,18 +17,20 @@ export default class MazeGame {
   gameEndTimestamp = 0;
 
   // Maze representation
-  maze = new Maze(41);
+  maze = new Maze(51);
   mazeRenderer = new MazeRenderer("maze");
   player = new Player();
   inputHandler = new InputHandler();
 
+  /**
+   * Starts the game loop.
+   */
   constructor() {
-    // Start the game loop
     window.requestAnimationFrame(() => this.step());
   }
 
   /**
-   * The game loop, called repeatedly at the refresh rate of the client's monitor
+   * The game loop, called repeatedly at the refresh rate of the client's monitor.
    */
   step() {
     if (this.gameState === GameState.IN_GAME) {
@@ -50,11 +52,7 @@ export default class MazeGame {
       return;
     }
 
-    // Increase the maze size before every game but the first
-    if (this.player.mazesCompleted > 0) {
-      this.maze = new Maze(this.maze.size + 2);
-    }
-
+    this.maze = new Maze(this.maze.size);
     this.player.resetPosition();
     this.gameState = GameState.IN_GAME;
     this.gameStartTimestamp = new Date().getTime();
@@ -65,7 +63,7 @@ export default class MazeGame {
    */
   updateGame() {
     // Check win conditions
-    if (this.maze.get(this.player.x, this.player.y) === -2) {
+    if (this.maze.get(this.player.x, this.player.y) === GOAL) {
       this.gameState = GameState.END;
       this.gameEndTimestamp = new Date().getTime();
       this.player.mazesCompleted += 1;

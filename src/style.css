@@ -21,7 +21,7 @@ main {
 }
 
 canvas#maze {
-  border: 8px solid #333;
+  border: 8px solid black;
 }
 
 p#game-text {
@@ -29,7 +29,7 @@ p#game-text {
   margin-top: 0;
   font-family: sans-serif;
   text-align: center;
-  color: white;
+  color: #FAF9F6;
 }
 
 /* Positions a link to the maze-game GitHub repo in the bottom right corner */
@@ -47,6 +47,6 @@ a#github-logo {
   img:hover {
     transition: filter 0.3s ease;
     width: 48px;
-    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+    filter: drop-shadow(0 0 12px rgba(250, 249, 246, 0.8));
   }
 }
