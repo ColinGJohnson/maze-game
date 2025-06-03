@@ -2,7 +2,7 @@
 
 A JavaScript browser game in which the player successively completes increasingly difficult randomly generated mazes. Play now at https://colingjohnson.github.io/maze-game/.
 
-![image](https://github.com/user-attachments/assets/c0378226-e22b-41b8-8ede-5f7118cbec18)
+![image](https://github.com/user-attachments/assets/be6e2de8-e3bc-4d89-b693-a59e61fd6523)
 
 ## Controls
 
