@@ -96,17 +96,14 @@ export default class MazeRenderer {
     }
 
     if (mazeGame.gameState === GameState.START) {
-      // draw instructions
-      this.text.innerText = "Press SPACE to start and use the arrow keys to move.";
+      this.text.innerHTML = "Press any key to start <br> Use WASD or arrow keys to move";
     } else if (mazeGame.gameState === GameState.IN_GAME) {
-      // draw timer
       const currentTimeMs = new Date().getTime();
       const secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
       this.text.innerHTML = `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
-      // draw time taken
       const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      this.text.innerText = "Finished in " + secondsPassed.toFixed(2) + "s";
+      this.text.innerHTML = `Finished in <b>${secondsPassed.toFixed(2)}s</b>`;
     }
   }
 }

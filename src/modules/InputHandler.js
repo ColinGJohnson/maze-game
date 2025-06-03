@@ -1,13 +1,17 @@
+export const Key = {
+  UP: 38,
+  DOWN: 40,
+  LEFT: 37,
+  RIGHT: 39,
+  W: 87,
+  A: 65,
+  S: 83,
+  D: 68,
+};
+
 export default class InputHandler {
   constructor() {
     this._pressed = {};
-
-    this.UP = 38;
-    this.DOWN = 40;
-    this.LEFT = 37;
-    this.RIGHT = 39;
-    this.SPACE = 32;
-
     window.addEventListener("keydown", (event) => this.onKeydown(event));
     window.addEventListener("keyup", (event) => this.onKeyup(event));
   }
@@ -19,6 +23,10 @@ export default class InputHandler {
    */
   isDown(keyCode) {
     return !!this._pressed[keyCode];
+  }
+
+  anyPressed() {
+    return Object.keys(this._pressed).length > 0;
   }
 
   reset() {

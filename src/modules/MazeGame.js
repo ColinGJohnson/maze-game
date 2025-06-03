@@ -1,7 +1,7 @@
 import Maze, { GOAL, WALL } from "./Maze.js";
 import MazeRenderer from "./MazeRenderer.js";
 import Player from "./Player.js";
-import InputHandler from "./InputHandler.js";
+import InputHandler, { Key } from "./InputHandler.js";
 
 export const GameState = Object.freeze({
   START: 0,
@@ -48,11 +48,12 @@ export default class MazeGame {
    */
   updateMenu() {
     // Do nothing until the user requests to start the game
-    if (!this.inputHandler.isDown(this.inputHandler.SPACE)) {
+    if (!this.inputHandler.anyPressed()) {
       return;
     }
 
     this.maze = new Maze(this.maze.size);
+    this.inputHandler.reset();
     this.player.resetPosition();
     this.gameState = GameState.IN_GAME;
     this.gameStartTimestamp = new Date().getTime();
@@ -85,10 +86,21 @@ export default class MazeGame {
       }
     };
 
-    if (this.inputHandler.isDown(this.inputHandler.RIGHT)) tryMove(1, 0);
-    if (this.inputHandler.isDown(this.inputHandler.LEFT)) tryMove(-1, 0);
-    if (this.inputHandler.isDown(this.inputHandler.DOWN)) tryMove(0, 1);
-    if (this.inputHandler.isDown(this.inputHandler.UP)) tryMove(0, -1);
+    if (this.inputHandler.isDown(Key.RIGHT) || this.inputHandler.isDown(Key.D)) {
+      tryMove(1, 0);
+    }
+
+    if (this.inputHandler.isDown(Key.LEFT) || this.inputHandler.isDown(Key.A)) {
+      tryMove(-1, 0);
+    }
+
+    if (this.inputHandler.isDown(Key.DOWN) || this.inputHandler.isDown(Key.S)) {
+      tryMove(0, 1);
+    }
+
+    if (this.inputHandler.isDown(Key.UP) || this.inputHandler.isDown(Key.W)) {
+      tryMove(0, -1);
+    }
 
     this.inputHandler.reset();
   }
