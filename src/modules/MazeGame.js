@@ -17,7 +17,7 @@ export default class MazeGame {
   gameEndTimestamp = 0;
 
   // Maze representation
-  maze = new Maze(51);
+  maze = new Maze(31);
   mazeRenderer = new MazeRenderer("maze");
   player = new Player();
   inputHandler = new InputHandler();
@@ -33,10 +33,12 @@ export default class MazeGame {
    * The game loop, called repeatedly at the refresh rate of the client's monitor.
    */
   step() {
-    if (this.gameState === GameState.IN_GAME) {
+    if (this.gameState === GameState.START || this.gameState === GameState.END) {
+      this.updateMenu();
+    } else if (this.gameState === GameState.IN_GAME) {
       this.updateGame();
     } else {
-      this.updateMenu();
+      throw new Error(`Invalid game state: ${this.gameState}`);
     }
 
     this.mazeRenderer.render(this);
@@ -44,7 +46,7 @@ export default class MazeGame {
   }
 
   /**
-   * Updates the game menu state and prepares the game to start or continue.
+   * Updates the game menu state and prepares the game to start
    */
   updateMenu() {
     // Do nothing until the user requests to start the game

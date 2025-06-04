@@ -41,52 +41,20 @@ export default class MazeRenderer {
    * @param {MazeGame} mazeGame the MazeGame to draw.
    */
   render(mazeGame) {
-    // update dimensions
+    // update canvas dimensions in case the window was resized
     this.updateDimensions(mazeGame);
 
     // draw black background
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // draw maze grid
-    let maze = mazeGame.maze;
-    this.ctx.strokeStyle = "grey";
-    this.ctx.lineWidth = 1;
-
-    // fill maze squares
-    for (let x = 0; x < maze.size; x++) {
-      for (let y = 0; y < maze.size; y++) {
-        if (maze.get(x, y) !== -1) {
-          // fill with white if unvisited
-          if (maze.get(x, y) === 0) {
-            this.ctx.fillStyle = "#FAF9F6";
-
-            // cycle colors if this is the goal cell
-          } else if (maze.get(x, y) === GOAL) {
-            this.ctx.fillStyle = "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
-
-            // otherwise dynamically color
-          } else {
-            let hue = 150 - maze.get(x, y) * this.colorRate;
-            hue = hue < 0 ? 0 : hue;
-            this.ctx.fillStyle = "hsl(" + hue + ", 90%, 50%)";
-          }
-
-          let topLeft = {
-            x: Math.round(x * this.cellWidthPx),
-            y: Math.round(y * this.cellWidthPx),
-          };
-
-          this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
-        }
-      }
-    }
-
     // if game has been started at least once
     if (mazeGame.gameState !== GameState.START) {
-      const player = mazeGame.player;
+      // fill maze squares
+      this.drawMaze(mazeGame);
 
       // draw player square
+      const player = mazeGame.player;
       this.ctx.fillStyle = "grey";
       let topLeft = {
         x: Math.round(player.x * this.cellWidthPx),
@@ -103,7 +71,41 @@ export default class MazeRenderer {
       this.text.innerHTML = `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      this.text.innerHTML = `Finished in <b>${secondsPassed.toFixed(2)}s</b>`;
+      this.text.innerHTML = `Finished in <b>${secondsPassed.toFixed(2)}s</b><br>Press any key to restart`;
+    }
+  }
+
+  /**
+   * Renders a visual representation of the maze on the canvas.
+   *
+   * @param {MazeGame} mazeGame - The maze game object containing the maze data.
+   */
+  drawMaze(mazeGame) {
+    let maze = mazeGame.maze;
+    for (let x = 0; x < maze.size; x++) {
+      for (let y = 0; y < maze.size; y++) {
+        if (maze.get(x, y) !== -1) {
+          if (maze.get(x, y) === 0) {
+            // fill with white if unvisited
+            this.ctx.fillStyle = "#FAF9F6";
+          } else if (maze.get(x, y) === GOAL) {
+            // cycle colors if this is the goal cell
+            this.ctx.fillStyle = "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
+          } else {
+            // otherwise dynamically color
+            let hue = 150 - maze.get(x, y) * this.colorRate;
+            hue = hue < 0 ? 0 : hue;
+            this.ctx.fillStyle = "hsl(" + hue + ", 90%, 50%)";
+          }
+
+          let topLeft = {
+            x: Math.round(x * this.cellWidthPx),
+            y: Math.round(y * this.cellWidthPx),
+          };
+
+          this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
+        }
+      }
     }
   }
 }
