@@ -44,71 +44,41 @@ export default class Maze {
    */
   generate(mazeSize) {
     // create new 2D array to store the maze and fill with -1's
-    let mazeArray = Array.from(Array(mazeSize), () => new Array(mazeSize).fill(WALL));
-
-    /**
-     * Randomly selects a coordinate to proceed to given a partially completed
-     * maze and a coordinate to proceed from.
-     *
-     * @param mazeArray
-     * @param x
-     * @param y
-     * @returns {undefined|*}
-     */
-    const chooseNext = (mazeArray, x, y) => {
-      let options = [];
-      let jumpDist = 2;
-
-      // up
-      if (y > jumpDist && mazeArray[x][y - jumpDist] === WALL) {
-        options.push({ x: x, y: y - jumpDist });
-      }
-
-      // down
-      if (y < mazeArray.length - 1 && mazeArray[x][y + jumpDist] === WALL) {
-        options.push({ x: x, y: y + jumpDist });
-      }
-
-      // left
-      if (x > jumpDist && mazeArray[x - jumpDist][y] === WALL) {
-        options.push({ x: x - jumpDist, y: y });
-      }
-
-      // right
-      if (x < mazeArray.length - jumpDist && mazeArray[x + jumpDist][y] === WALL) {
-        options.push({ x: x + jumpDist, y: y });
-      }
-
-      if (options.length === 0) {
-        return undefined;
-      } else {
-        return options[Math.floor(this.random.quick() * options.length)];
-      }
-    };
+    const mazeArray = Array.from(Array(mazeSize), () => new Array(mazeSize).fill(WALL));
 
     // start at 1,1
-    let genStack = [{ x: 1, y: 1 }];
+    const genStack = [{ x: 1, y: 1, distance: 0 }];
+    const visited = new Set();
     let furthestCell = { x: 1, y: 1 };
-    let maxStack = 0;
+    let maxDistance = 0;
 
     // continue generating until backtracking is complete
     while (genStack.length > 0) {
-      // get current cell by peeking stack
-      let current = genStack[genStack.length - 1];
+      // random chance to backtrack before doing so is necessary to increase branching factor
+      let currentIndex = genStack.length - 1;
+      if (this.random.quick() > 0.9) {
+        currentIndex = Math.floor(this.random.quick() * (genStack.length - 1));
+      }
+      const current = genStack.splice(currentIndex, 1)[0];
 
-      // mark current cell as visited (0) in mazeArray
+      const key = `${current.x},${current.y}`;
+      if (visited.has(key)) {
+        continue;
+      } else {
+        visited.add(key);
+      }
+
       mazeArray[current.x][current.y] = 0;
 
       // check if this is the new furthest cell from 1,1
-      if (genStack.length > maxStack) {
+      if (current.distance > maxDistance) {
         furthestCell = current;
-        maxStack = genStack.length;
+        maxDistance = current.distance;
       }
 
       // mark cell between current and last as visited (0)
-      if (genStack.length > 1) {
-        let previous = genStack[genStack.length - 2];
-
+      const previous = current.previous;
+      if (previous) {
         // from left to right
         if (current.x > previous.x) {
           mazeArray[current.x - 1][current.y] = 0;
@@ -128,18 +98,47 @@ export default class Maze {
       }
 
       // proceed to an adjacent unvisited cell if one exists
-      let next = chooseNext(mazeArray, current.x, current.y);
-      if (next) {
-        genStack.push(next);
-      } else {
-        genStack.pop();
-      }
+      genStack.push(...this.nextNodes(mazeArray, current));
     }
 
     // mark the furthest cell from (1,1), which will be the goal
     mazeArray[furthestCell.x][furthestCell.y] = GOAL;
-
     return mazeArray;
+  }
+
+  /**
+   * Randomly selects a coordinate to visit next given a partially completed
+   * maze and a coordinate to start from.
+   */
+  nextNodes(mazeArray, current) {
+    const { x, y } = current;
+    let options = [];
+    let jumpDist = 2;
+    const common = { previous: current, distance: current.distance + 1 };
+
+    // up
+    if (y > jumpDist && mazeArray[x][y - jumpDist] === WALL) {
+      options.push({ x: x, y: y - jumpDist, ...common });
+    }
+
+    // down
+    if (y < mazeArray.length - 1 && mazeArray[x][y + jumpDist] === WALL) {
+      options.push({ x: x, y: y + jumpDist, ...common });
+    }
+
+    // left
+    if (x > jumpDist && mazeArray[x - jumpDist][y] === WALL) {
+      options.push({ x: x - jumpDist, y: y, ...common });
+    }
+
+    // right
+    if (x < mazeArray.length - jumpDist && mazeArray[x + jumpDist][y] === WALL) {
+      options.push({ x: x + jumpDist, y: y, ...common });
+    }
+
+    // randomly shuffle options
+    options = options.sort(() => this.random.quick() - 0.5);
+    return options;
   }
 }
 
