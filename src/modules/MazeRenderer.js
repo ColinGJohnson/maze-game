@@ -31,7 +31,6 @@ export default class MazeRenderer {
     this.canvas.height = size;
 
     this.canvas.style.borderRadius = this.cellWidthPx + "px";
-    this.canvas.style.borderWidth = this.cellWidthPx / 2 + "px";
     this.text.style.fontSize = size / 25 + "px";
   }
 
