@@ -2,78 +2,102 @@ import seedrandom from "seedrandom";
 
 import { GOAL, WALL } from "./Maze.js";
 
+const PATH = 0;
 const JUMP_DIST = 2;
+const START_POSITION = { x: 1, y: 1 };
+const BACKTRACK_PROBABILITY = 0.9;
 
 /**
  * Iteratively generates a random maze through backtracking.
- * @param mazeSize The edge length of the maze to be generated.
- * @param date Day to use as a seed for random number generation.
- * @returns {any[][]} A two-dimensional array of integers representing the maze.
+ * @param {number} mazeSize The edge length of the maze to be generated.
+ * @param {Date} date Day to use as a seed for random number generation.
+ * @returns {number[][]} A two-dimensional array of integers representing the maze.
  */
 export function generate(mazeSize, date = new Date()) {
   const random = dailyRandom(date);
+  const mazeArray = initializeMazeGrid(mazeSize);
+  const pathData = populateMazeGrid(mazeArray, random);
 
-  // create new 2D array to store the maze and fill with -1's
-  const mazeArray = Array.from(Array(mazeSize), () => new Array(mazeSize).fill(WALL));
+  const { furthestCell } = pathData;
+  mazeArray[furthestCell.x][furthestCell.y] = GOAL;
 
-  // start at 1,1
-  const genStack = [{ x: 1, y: 1, distance: 0 }];
+  return mazeArray;
+}
+
+/**
+ * Creates a new maze grid filled with walls
+ * @param {number} size The size of the maze grid
+ * @returns {number[][]} A grid filled with wall values
+ */
+function initializeMazeGrid(size) {
+  return Array.from(Array(size), () => new Array(size).fill(WALL));
+}
+
+/**
+ * Connects two adjacent cells by marking the cell between them as a path
+ * @param {number[][]} maze The maze grid
+ * @param {Object} current The current cell
+ * @param {Object} previous The previous cell
+ */
+function connectCells(maze, current, previous) {
+  if (!previous) return;
+
+  const dx = Math.sign(current.x - previous.x);
+  const dy = Math.sign(current.y - previous.y);
+
+  const connectionX = current.x - dx;
+  const connectionY = current.y - dy;
+
+  maze[connectionX][connectionY] = PATH;
+}
+
+/**
+ * Finds the longest path through the maze using a backtracking algorithm
+ * @param {number[][]} maze The maze grid to carve paths through
+ * @param {Object} random The random number generator
+ * @returns {Object} Data about the path including the furthest cell
+ */
+function populateMazeGrid(maze, random) {
+  const genStack = [{ ...START_POSITION, distance: 0 }];
   const visited = new Set();
-  let furthestCell = { x: 1, y: 1 };
+  let furthestCell = { ...START_POSITION };
   let maxDistance = 0;
 
-  // continue generating until backtracking is complete
   while (genStack.length > 0) {
-    // random chance to backtrack before doing so is necessary to increase branching factor
-    let currentIndex = genStack.length - 1;
-    if (random.quick() > 0.9) {
-      currentIndex = Math.floor(random.quick() * (genStack.length - 1));
-    }
-    const current = genStack.splice(currentIndex, 1)[0];
+    const currentIndex = shouldBacktrack(random)
+      ? Math.floor(random.quick() * (genStack.length - 1))
+      : genStack.length - 1;
 
-    const key = `${current.x},${current.y}`;
-    if (visited.has(key)) {
+    const current = genStack.splice(currentIndex, 1)[0];
+    const positionKey = `${current.x},${current.y}`;
+
+    if (visited.has(positionKey)) {
       continue;
     } else {
-      visited.add(key);
+      visited.add(positionKey);
     }
 
-    mazeArray[current.x][current.y] = 0;
+    maze[current.x][current.y] = PATH;
 
-    // check if this is the new furthest cell from 1,1
     if (current.distance > maxDistance) {
       furthestCell = current;
       maxDistance = current.distance;
     }
 
-    // mark cell between current and last as visited (0)
-    const previous = current.previous;
-    if (previous) {
-      // from left to right
-      if (current.x > previous.x) {
-        mazeArray[current.x - 1][current.y] = 0;
-
-        // from right to left
-      } else if (current.x < previous.x) {
-        mazeArray[current.x + 1][current.y] = 0;
-
-        // from above to below
-      } else if (current.y > previous.y) {
-        mazeArray[current.x][current.y - 1] = 0;
-
-        // from below to above
-      } else {
-        mazeArray[current.x][current.y + 1] = 0;
-      }
-    }
-
-    // proceed to an adjacent unvisited cell if one exists
-    genStack.push(...nextValidNodes(random, mazeArray, current));
+    connectCells(maze, current, current.previous);
+    genStack.push(...nextValidNodes(random, maze, current));
   }
 
-  // mark the furthest cell from (1,1), which will be the goal
-  mazeArray[furthestCell.x][furthestCell.y] = GOAL;
-  return mazeArray;
+  return { furthestCell, maxDistance };
+}
+
+/**
+ * Determines if we should backtrack based on random probability
+ * @param {Object} random The random number generator
+ * @returns {boolean} True if we should backtrack
+ */
+function shouldBacktrack(random) {
+  return random.quick() > BACKTRACK_PROBABILITY;
 }
 
 /**
@@ -91,6 +115,9 @@ function nextValidNodes(random, mazeArray, start) {
   return nextNodes(start).filter(isValid).sort(randomCompare);
 }
 
+/**
+ * Calculates the next possible nodes based on a starting position and a fixed jump distance.
+ */
 function nextNodes(start) {
   const getMove = (newX, newY) => ({
     x: newX,
