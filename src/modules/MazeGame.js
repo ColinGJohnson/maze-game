@@ -50,7 +50,7 @@ export default class MazeGame {
    */
   updateMenu() {
     // Do nothing until the user requests to start the game
-    if (!this.inputHandler.anyPressed()) {
+    if (!this.inputHandler.isDown(Key.SPACE)) {
       return;
     }
 

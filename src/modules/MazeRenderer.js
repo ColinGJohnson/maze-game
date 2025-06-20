@@ -63,7 +63,7 @@ export default class MazeRenderer {
     }
 
     if (mazeGame.gameState === GameState.START) {
-      this.text.innerHTML = "Press any key to start <br> Use WASD or arrow keys to move";
+      this.text.innerHTML = "Press the space bar to start <br> Use WASD or arrow keys to move";
     } else if (mazeGame.gameState === GameState.IN_GAME) {
       const currentTimeMs = new Date().getTime();
       const secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
