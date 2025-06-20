@@ -83,28 +83,34 @@ export default class MazeRenderer {
     let maze = mazeGame.maze;
     for (let x = 0; x < maze.size; x++) {
       for (let y = 0; y < maze.size; y++) {
-        if (maze.get(x, y) !== -1) {
-          if (maze.get(x, y) === 0) {
-            // fill with white if unvisited
-            this.ctx.fillStyle = "#FAF9F6";
-          } else if (maze.get(x, y) === GOAL) {
-            // cycle colors if this is the goal cell
-            this.ctx.fillStyle = "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
-          } else {
-            // otherwise dynamically color
-            let hue = 150 - maze.get(x, y) * this.colorRate;
-            hue = hue < 0 ? 0 : hue;
-            this.ctx.fillStyle = "hsl(" + hue + ", 90%, 50%)";
-          }
-
-          let topLeft = {
-            x: Math.round(x * this.cellWidthPx),
-            y: Math.round(y * this.cellWidthPx),
-          };
-
-          this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
+        if (maze.get(x, y) === -1) {
+          continue;
         }
+        let topLeft = {
+          x: Math.round(x * this.cellWidthPx),
+          y: Math.round(y * this.cellWidthPx),
+        };
+        this.ctx.fillStyle = this.getCellColor(maze, x, y);
+        this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
       }
+    }
+  }
+
+  /**
+   * Determines the color of a specific cell in the maze based on its value:
+   *  - Fill with white if unvisited
+   *  - Cycle colors if this is the goal cell
+   *  - Otherwise dynamically color
+   */
+  getCellColor(maze, x, y) {
+    if (maze.get(x, y) === 0) {
+      return "#FAF9F6";
+    } else if (maze.get(x, y) === GOAL) {
+      return "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
+    } else {
+      let hue = 150 - maze.get(x, y) * this.colorRate;
+      hue = hue < 0 ? 0 : hue;
+      return "hsl(" + hue + ", 90%, 50%)";
     }
   }
 }

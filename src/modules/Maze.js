@@ -11,6 +11,7 @@ export default class Maze {
   maze;
 
   constructor(size) {
+    if (size < 5) throw new Error("Maze size must be at least 5");
     this.size = size;
     this.maze = generate(this.size);
   }
