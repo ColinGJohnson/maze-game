@@ -79,16 +79,27 @@ export default class MazeRenderer {
    * @param {MazeGame} mazeGame - The maze game object containing the maze data.
    */
   drawMaze(mazeGame) {
-    let maze = mazeGame.maze;
+    const maze = mazeGame.maze;
+
+    const fadeTime = 1500;
+    const timeSinceStart = Date.now() - mazeGame.gameStartTimestamp;
+    const fadeAlpha = Math.min(1, timeSinceStart / fadeTime);
+
     for (let x = 0; x < maze.size; x++) {
       for (let y = 0; y < maze.size; y++) {
+        if ((x + y) / (maze.size * 2) > fadeAlpha) {
+          continue;
+        }
+
         if (maze.get(x, y) === -1) {
           continue;
         }
-        let topLeft = {
+
+        const topLeft = {
           x: Math.round(x * this.cellWidthPx),
           y: Math.round(y * this.cellWidthPx),
         };
+
         this.ctx.fillStyle = this.getCellColor(maze, x, y);
         this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
       }
@@ -130,7 +141,7 @@ export default class MazeRenderer {
       text = `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      text = `Finished in <b>${secondsPassed.toFixed(2)}s</b><br>Press any key to restart`;
+      text = `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>Press any key to restart`;
     }
     return text;
   }
