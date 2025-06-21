@@ -16,3 +16,7 @@ Space Bar - start game
 - Show stats, ex: efficiency
 - Increase difficulty over time (Start Screen -> 10x10 -> 20x20 -> ... -> 100x100 -> Win Screen)
 - Press Space to restart at any time (not forced to complete the maze)
+
+## Credits
+
+Input prompts from [Kenney.nl](https://kenney.nl/assets/input-prompts).

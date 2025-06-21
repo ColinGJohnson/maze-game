@@ -31,7 +31,10 @@ export default class MazeRenderer {
       this.drawPlayer(mazeGame.player);
     }
 
-    this.text.innerHTML = this.getTopText(mazeGame);
+    const topText = this.getTopText(mazeGame);
+    if (topText !== this.text.innerHTML) {
+      this.text.innerHTML = topText;
+    }
   }
 
   /**
@@ -126,23 +129,24 @@ export default class MazeRenderer {
 
   /**
    * @param {MazeGame} mazeGame - The maze game object containing game state information.
-   * @param {string} text - The default text to display if no game state text applies.
    * @returns {string} The text to display based on the current game state:
    *   - At start: Shows instructions to start and movement controls
    *   - During game: Shows elapsed time in seconds
    *   - At end: Shows completion time and restart instructions
    */
-  getTopText(mazeGame, text) {
+  getTopText(mazeGame) {
     if (mazeGame.gameState === GameState.START) {
-      text = "Press the space bar to start <br> Use WASD or arrow keys to move";
+      const spaceBar = '<span class="input-prompt">\u{E0C8}</span>';
+      const arrowKeys = '<span class="input-prompt">\u{E025}</span>';
+      return `${spaceBar} to start, ${arrowKeys} to move`;
     } else if (mazeGame.gameState === GameState.IN_GAME) {
       const currentTimeMs = new Date().getTime();
       const secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
-      text = `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
+      return `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      text = `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>Press any key to restart`;
+      return `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>Press any key to restart`;
     }
-    return text;
+    return "";
   }
 }
