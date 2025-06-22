@@ -1,5 +1,5 @@
 import { GameState } from "./MazeGame.js";
-import { GOAL } from "./Maze.js";
+import { GOAL, WALL } from "./Maze.js";
 
 /**
  * Manages drawing a square maze on a HTML Canvas element.
@@ -28,7 +28,6 @@ export default class MazeRenderer {
 
     if (mazeGame.gameState !== GameState.START) {
       this.drawMaze(mazeGame);
-      this.drawPlayer(mazeGame.player);
     }
 
     const topText = this.getTopText(mazeGame);
@@ -63,65 +62,56 @@ export default class MazeRenderer {
   }
 
   /**
-   * Draws the player on the canvas within the maze game.
-   *
-   * @param {Player} player - The maze game object containing the player's information.
-   */
-  drawPlayer(player) {
-    this.ctx.fillStyle = "grey";
-    const topLeft = {
-      x: Math.round(player.x * this.cellWidthPx),
-      y: Math.round(player.y * this.cellWidthPx),
-    };
-    this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
-  }
-
-  /**
    * Renders a visual representation of the maze on the canvas.
    *
    * @param {MazeGame} mazeGame - The maze game object containing the maze data.
    */
   drawMaze(mazeGame) {
     const maze = mazeGame.maze;
-
-    const fadeTime = 1500;
+    const animationLength = 2000;
     const timeSinceStart = Date.now() - mazeGame.gameStartTimestamp;
-    const fadeAlpha = Math.min(1, timeSinceStart / fadeTime);
+    const startAnimationProgress = easeInOutSine(Math.min(1, timeSinceStart / animationLength));
 
     for (let x = 0; x < maze.size; x++) {
       for (let y = 0; y < maze.size; y++) {
-        if ((x + y) / (maze.size * 2) > fadeAlpha) {
-          continue;
+        if (maze.get(x, y) !== WALL) {
+          this.ctx.fillStyle = this.getCellColor(mazeGame, x, y);
+          this.drawCell(maze, x, y, startAnimationProgress);
         }
-
-        if (maze.get(x, y) === -1) {
-          continue;
-        }
-
-        const topLeft = {
-          x: Math.round(x * this.cellWidthPx),
-          y: Math.round(y * this.cellWidthPx),
-        };
-
-        this.ctx.fillStyle = this.getCellColor(maze, x, y);
-        this.ctx.fillRect(topLeft.x, topLeft.y, this.cellWidthPx, this.cellWidthPx);
       }
     }
   }
 
+  drawCell(maze, x, y, t) {
+    const m = 4;
+    const d = 1 - (x + y) / (maze.size * 2);
+
+    const scale = easeInOutSine(clamp(m * (d + t * (1 + 1 / m) - 1), 0, 1));
+    const scaledWidth = Math.round(this.cellWidthPx * scale);
+
+    const topLeft = {
+      x: Math.round(x * this.cellWidthPx + (this.cellWidthPx - scaledWidth) / 2),
+      y: Math.round(y * this.cellWidthPx + (this.cellWidthPx - scaledWidth) / 2),
+    };
+
+    this.ctx.fillRect(topLeft.x, topLeft.y, scaledWidth, scaledWidth);
+  }
+
   /**
    * Determines the color of a specific cell in the maze based on its value:
+   *  - Cycle hue if this is the goal cell
    *  - Fill with white if unvisited
-   *  - Cycle colors if this is the goal cell
-   *  - Otherwise dynamically color
+   *  - Otherwise dynamically color based on number of visits
    */
-  getCellColor(maze, x, y) {
-    if (maze.get(x, y) === 0) {
+  getCellColor(mazeGame, x, y) {
+    if (mazeGame.player.x === x && mazeGame.player.y === y) {
+      return "gray";
+    } else if (mazeGame.maze.get(x, y) === 0) {
       return "#FAF9F6";
-    } else if (maze.get(x, y) === GOAL) {
+    } else if (mazeGame.maze.get(x, y) === GOAL) {
       return "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
     } else {
-      let hue = 150 - maze.get(x, y) * this.colorRate;
+      let hue = 150 - mazeGame.maze.get(x, y) * this.colorRate;
       hue = hue < 0 ? 0 : hue;
       return "hsl(" + hue + ", 90%, 50%)";
     }
@@ -135,18 +125,35 @@ export default class MazeRenderer {
    *   - At end: Shows completion time and restart instructions
    */
   getTopText(mazeGame) {
+    const spaceBar = '<span class="input-prompt">\u{E0C8}</span>';
+    const arrowKeys = '<span class="input-prompt">\u{E025}</span>';
+
     if (mazeGame.gameState === GameState.START) {
-      const spaceBar = '<span class="input-prompt">\u{E0C8}</span>';
-      const arrowKeys = '<span class="input-prompt">\u{E025}</span>';
       return `${spaceBar} to start, ${arrowKeys} to move`;
     } else if (mazeGame.gameState === GameState.IN_GAME) {
       const currentTimeMs = new Date().getTime();
       const secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
-      return `<b>${secondsPassed.toFixed(2) + "s"}</b>`;
+      return `<b>${secondsPassed.toFixed(2)}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      return `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>Press any key to restart`;
+      return `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>Press ${spaceBar} restart`;
     }
     return "";
   }
+}
+
+/**
+ * Returns a number whose value is limited to the given range.
+ *
+ * @param {Number} number The number to clamp
+ * @param {Number} min The lower boundary of the output range
+ * @param {Number} max The upper boundary of the output range
+ * @returns A value in the range [min, max]
+ */
+function clamp(number, min, max) {
+  return Math.min(Math.max(number, min), max);
+}
+
+function easeInOutSine(x) {
+  return -(Math.cos(Math.PI * x) - 1) / 2;
 }

@@ -30,7 +30,7 @@ main {
 }
 
 canvas#maze {
-  border: 2px solid gray;
+  border: 3px solid gray;
 }
 
 .game-text-container {
