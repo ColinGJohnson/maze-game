@@ -43,13 +43,12 @@ export default class MazeRenderer {
    */
   updateCanvasDimensions(mazeSize) {
     const container = document.querySelector(".maze-container");
-
     this.cellWidthPx = Math.round(container.clientWidth / mazeSize);
     const size = this.cellWidthPx * mazeSize;
     this.canvas.width = size;
     this.canvas.height = size;
-
     this.canvas.style.borderRadius = this.cellWidthPx + "px";
+    this.canvas.hidden = false;
     this.text.style.fontSize = size / 25 + "px";
   }
 
@@ -83,10 +82,9 @@ export default class MazeRenderer {
   }
 
   drawCell(maze, x, y, t) {
-    const m = 4;
-    const d = 1 - (x + y) / (maze.size * 2);
-
-    const scale = easeInOutSine(clamp(m * (d + t * (1 + 1 / m) - 1), 0, 1));
+    const spread = 4;
+    const diagonal = 1 - (x + y) / (maze.size * 2);
+    const scale = easeInOutSine(clamp(spread * (diagonal + t * (1 + 1 / spread) - 1), 0, 1));
     const scaledWidth = Math.round(this.cellWidthPx * scale);
 
     const topLeft = {
@@ -136,7 +134,7 @@ export default class MazeRenderer {
       return `<b>${secondsPassed.toFixed(2)}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      return `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>Press ${spaceBar} restart`;
+      return `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>${spaceBar} to restart`;
     }
     return "";
   }

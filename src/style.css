@@ -4,7 +4,7 @@
        url('/kenney_input_keyboard_&_mouse.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 html, body {
@@ -47,6 +47,7 @@ p#game-text {
   font-family: sans-serif;
   text-align: center;
   color: #FAF9F6;
+  line-height: 80%;
 }
 
 span.input-prompt {
