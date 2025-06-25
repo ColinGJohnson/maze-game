@@ -131,10 +131,12 @@ export default class MazeRenderer {
     } else if (mazeGame.gameState === GameState.IN_GAME) {
       const currentTimeMs = new Date().getTime();
       const secondsPassed = (currentTimeMs - mazeGame.gameStartTimestamp) / 1000;
-      return `<b>${secondsPassed.toFixed(2)}</b>`;
+      const level = mazeGame.player.mazesCompleted + 1;
+      return `Level ${level}<br><b>${secondsPassed.toFixed(2)}</b>`;
     } else if (mazeGame.gameState === GameState.END) {
       const secondsPassed = (mazeGame.gameEndTimestamp - mazeGame.gameStartTimestamp) / 1000;
-      return `Finished in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>${spaceBar} to restart`;
+      const level = mazeGame.player.mazesCompleted;
+      return `Level ${level} complete in <b style="color: #13EF0C">${secondsPassed.toFixed(2)}s</b><br>${spaceBar} to continue`;
     }
     return "";
   }

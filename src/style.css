@@ -47,13 +47,15 @@ p#game-text {
   font-family: sans-serif;
   text-align: center;
   color: #FAF9F6;
-  line-height: 80%;
+  line-height: 1.2em;
 }
 
 span.input-prompt {
   font-family: 'Kenney Input', sans-serif;
   font-size: 4em;
   vertical-align: sub;
+  display: inline-block;
+  height: inherit;
 }
 
 /* Positions a link to the maze-game GitHub repo in the bottom right corner */

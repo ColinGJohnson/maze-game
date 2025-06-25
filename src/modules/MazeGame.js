@@ -3,6 +3,8 @@ import MazeRenderer from "./MazeRenderer.js";
 import Player from "./Player.js";
 import InputHandler, { Key } from "./InputHandler.js";
 
+const INITIAL_MAZE_SIZE = 11;
+
 export const GameState = Object.freeze({
   START: 0,
   IN_GAME: 1,
@@ -11,13 +13,9 @@ export const GameState = Object.freeze({
 
 export default class MazeGame {
   gameState = GameState.START;
-
-  // Game stats
   gameStartTimestamp = 0;
   gameEndTimestamp = 0;
-
-  // Maze representation
-  maze = new Maze(31);
+  maze = new Maze(INITIAL_MAZE_SIZE);
   mazeRenderer = new MazeRenderer("maze");
   player = new Player();
   inputHandler = new InputHandler();
@@ -46,15 +44,16 @@ export default class MazeGame {
   }
 
   /**
-   * Updates the game menu state and prepares the game to start
+   * Wait to start the game until the space bar is pressed.
    */
   updateMenu() {
-    // Do nothing until the user requests to start the game
-    if (!this.inputHandler.isDown(Key.SPACE)) {
-      return;
+    if (this.inputHandler.isDown(Key.SPACE)) {
+      this.startGame();
     }
+  }
 
-    this.maze = new Maze(this.maze.size);
+  startGame() {
+    this.maze = new Maze(INITIAL_MAZE_SIZE + this.player.mazesCompleted * 2);
     this.inputHandler.reset();
     this.player.resetPosition();
     this.gameState = GameState.IN_GAME;
@@ -65,45 +64,51 @@ export default class MazeGame {
    * Updates the game state by checking win conditions, processing player movement, and handling input.
    */
   updateGame() {
-    // Check win conditions
+    this.checkWinCondition();
+
+    if (this.inputHandler.isDown(Key.RIGHT) || this.inputHandler.isDown(Key.D)) {
+      this.tryMove(1, 0);
+    }
+
+    if (this.inputHandler.isDown(Key.LEFT) || this.inputHandler.isDown(Key.A)) {
+      this.tryMove(-1, 0);
+    }
+
+    if (this.inputHandler.isDown(Key.DOWN) || this.inputHandler.isDown(Key.S)) {
+      this.tryMove(0, 1);
+    }
+
+    if (this.inputHandler.isDown(Key.UP) || this.inputHandler.isDown(Key.W)) {
+      this.tryMove(0, -1);
+    }
+
+    this.inputHandler.reset();
+  }
+
+  tryMove(x, y) {
+    while (this.maze.get(this.player.x + x, this.player.y + y) !== WALL) {
+      this.maze.visit(this.player);
+
+      this.player.x += x;
+      this.player.y += y;
+
+      const openLeft = this.maze.get(this.player.x + y, this.player.y + x) !== WALL;
+      const openRight = this.maze.get(this.player.x - y, this.player.y - x) !== WALL;
+
+      if (openLeft || openRight) {
+        break;
+      }
+    }
+  }
+
+  /**
+   * Checks if the player has reached the goal and updates game state accordingly.
+   */
+  checkWinCondition() {
     if (this.maze.get(this.player.x, this.player.y) === GOAL) {
       this.gameState = GameState.END;
       this.gameEndTimestamp = new Date().getTime();
       this.player.mazesCompleted += 1;
     }
-
-    const tryMove = (x, y) => {
-      while (this.maze.get(this.player.x + x, this.player.y + y) !== WALL) {
-        this.maze.visit(this.player);
-
-        this.player.x += x;
-        this.player.y += y;
-
-        const openLeft = this.maze.get(this.player.x + y, this.player.y + x) !== WALL;
-        const openRight = this.maze.get(this.player.x - y, this.player.y - x) !== WALL;
-
-        if (openLeft || openRight) {
-          break;
-        }
-      }
-    };
-
-    if (this.inputHandler.isDown(Key.RIGHT) || this.inputHandler.isDown(Key.D)) {
-      tryMove(1, 0);
-    }
-
-    if (this.inputHandler.isDown(Key.LEFT) || this.inputHandler.isDown(Key.A)) {
-      tryMove(-1, 0);
-    }
-
-    if (this.inputHandler.isDown(Key.DOWN) || this.inputHandler.isDown(Key.S)) {
-      tryMove(0, 1);
-    }
-
-    if (this.inputHandler.isDown(Key.UP) || this.inputHandler.isDown(Key.W)) {
-      tryMove(0, -1);
-    }
-
-    this.inputHandler.reset();
   }
 }
