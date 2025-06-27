@@ -5,7 +5,7 @@ import { GOAL, WALL } from "./Maze.js";
  * Manages drawing a square maze on a HTML Canvas element.
  */
 export default class MazeRenderer {
-  colorRate = 30;
+  #colorRate = 30;
 
   /**
    * MazeRenderer constructor
@@ -23,14 +23,14 @@ export default class MazeRenderer {
    * @param {MazeGame} mazeGame the MazeGame to draw.
    */
   render(mazeGame) {
-    this.updateCanvasDimensions(mazeGame.maze.size);
-    this.drawBackground();
+    this.#updateCanvasDimensions(mazeGame.maze.size);
+    this.#drawBackground();
 
     if (mazeGame.gameState !== GameState.START) {
-      this.drawMaze(mazeGame);
+      this.#drawMaze(mazeGame);
     }
 
-    const topText = this.getTopText(mazeGame);
+    const topText = this.#getTopText(mazeGame);
     if (topText !== this.text.innerHTML) {
       this.text.innerHTML = topText;
     }
@@ -41,7 +41,7 @@ export default class MazeRenderer {
    *
    * @param {number} mazeSize - mazeSize the MazeGame to draw. Will evenly divide the resulting canvas width.
    */
-  updateCanvasDimensions(mazeSize) {
+  #updateCanvasDimensions(mazeSize) {
     const container = document.querySelector(".maze-container");
     this.cellWidthPx = Math.round(container.clientWidth / mazeSize);
     const size = this.cellWidthPx * mazeSize;
@@ -55,7 +55,7 @@ export default class MazeRenderer {
   /**
    * Fill the canvas with a plain black background.
    */
-  drawBackground() {
+  #drawBackground() {
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
@@ -65,7 +65,7 @@ export default class MazeRenderer {
    *
    * @param {MazeGame} mazeGame - The maze game object containing the maze data.
    */
-  drawMaze(mazeGame) {
+  #drawMaze(mazeGame) {
     const maze = mazeGame.maze;
     const animationLength = 2000;
     const timeSinceStart = Date.now() - mazeGame.gameStartTimestamp;
@@ -74,14 +74,14 @@ export default class MazeRenderer {
     for (let x = 0; x < maze.size; x++) {
       for (let y = 0; y < maze.size; y++) {
         if (maze.get(x, y) !== WALL) {
-          this.ctx.fillStyle = this.getCellColor(mazeGame, x, y);
-          this.drawCell(maze, x, y, startAnimationProgress);
+          this.ctx.fillStyle = this.#getCellColor(mazeGame, x, y);
+          this.#drawCell(maze, x, y, startAnimationProgress);
         }
       }
     }
   }
 
-  drawCell(maze, x, y, t) {
+  #drawCell(maze, x, y, t) {
     const spread = 4;
     const diagonal = 1 - (x + y) / (maze.size * 2);
     const scale = easeInOutSine(clamp(spread * (diagonal + t * (1 + 1 / spread) - 1), 0, 1));
@@ -101,7 +101,7 @@ export default class MazeRenderer {
    *  - Fill with white if unvisited
    *  - Otherwise dynamically color based on number of visits
    */
-  getCellColor(mazeGame, x, y) {
+  #getCellColor(mazeGame, x, y) {
     if (mazeGame.player.x === x && mazeGame.player.y === y) {
       return "gray";
     } else if (mazeGame.maze.get(x, y) === 0) {
@@ -109,7 +109,7 @@ export default class MazeRenderer {
     } else if (mazeGame.maze.get(x, y) === GOAL) {
       return "hsl(" + ((Date.now() / 10) % 360) + ", 90%, 50%)";
     } else {
-      let hue = 150 - mazeGame.maze.get(x, y) * this.colorRate;
+      let hue = 150 - mazeGame.maze.get(x, y) * this.#colorRate;
       hue = hue < 0 ? 0 : hue;
       return "hsl(" + hue + ", 90%, 50%)";
     }
@@ -122,7 +122,7 @@ export default class MazeRenderer {
    *   - During game: Shows elapsed time in seconds
    *   - At end: Shows completion time and restart instructions
    */
-  getTopText(mazeGame) {
+  #getTopText(mazeGame) {
     const spaceBar = '<span class="input-prompt">\u{E0C8}</span>';
     const arrowKeys = '<span class="input-prompt">\u{E025}</span>';
 

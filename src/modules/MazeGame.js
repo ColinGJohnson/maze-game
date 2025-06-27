@@ -47,7 +47,7 @@ export default class MazeGame {
    * Wait to start the game until the space bar is pressed.
    */
   updateMenu() {
-    if (this.inputHandler.isDown(Key.SPACE)) {
+    if (this.inputHandler.pressed(Key.SPACE)) {
       this.startGame();
     }
   }
@@ -66,19 +66,19 @@ export default class MazeGame {
   updateGame() {
     this.checkWinCondition();
 
-    if (this.inputHandler.isDown(Key.RIGHT) || this.inputHandler.isDown(Key.D)) {
+    if (this.inputHandler.pressed(Key.RIGHT) || this.inputHandler.pressed(Key.D)) {
       this.tryMove(1, 0);
     }
 
-    if (this.inputHandler.isDown(Key.LEFT) || this.inputHandler.isDown(Key.A)) {
+    if (this.inputHandler.pressed(Key.LEFT) || this.inputHandler.pressed(Key.A)) {
       this.tryMove(-1, 0);
     }
 
-    if (this.inputHandler.isDown(Key.DOWN) || this.inputHandler.isDown(Key.S)) {
+    if (this.inputHandler.pressed(Key.DOWN) || this.inputHandler.pressed(Key.S)) {
       this.tryMove(0, 1);
     }
 
-    if (this.inputHandler.isDown(Key.UP) || this.inputHandler.isDown(Key.W)) {
+    if (this.inputHandler.pressed(Key.UP) || this.inputHandler.pressed(Key.W)) {
       this.tryMove(0, -1);
     }
 

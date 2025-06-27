@@ -13,8 +13,8 @@ export const Key = {
 export default class InputHandler {
   constructor() {
     this._pressed = {};
-    window.addEventListener("keydown", (event) => this.onKeydown(event));
-    window.addEventListener("keyup", (event) => this.onKeyup(event));
+    window.addEventListener("keydown", (event) => this.#onKeydown(event));
+    window.addEventListener("keyup", (event) => this.#onKeyup(event));
   }
 
   /**
@@ -22,12 +22,8 @@ export default class InputHandler {
    * @param {number} keyCode - The key code to check
    * @returns {boolean} True if the key is down, false otherwise
    */
-  isDown(keyCode) {
+  pressed(keyCode) {
     return !!this._pressed[keyCode];
-  }
-
-  anyPressed() {
-    return Object.keys(this._pressed).length > 0;
   }
 
   reset() {
@@ -38,7 +34,7 @@ export default class InputHandler {
    * Handle keydown event
    * @param {KeyboardEvent} event
    */
-  onKeydown(event) {
+  #onKeydown(event) {
     if (event.repeat) return;
     this._pressed[event.keyCode] = true;
   }
@@ -47,7 +43,7 @@ export default class InputHandler {
    * Handle keyup event
    * @param {KeyboardEvent} event
    */
-  onKeyup(event) {
+  #onKeyup(event) {
     delete this._pressed[event.keyCode];
   }
 }
