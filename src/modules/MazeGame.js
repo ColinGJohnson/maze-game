@@ -3,7 +3,8 @@ import MazeRenderer from "./MazeRenderer.js";
 import Player from "./Player.js";
 import InputHandler, { Key } from "./InputHandler.js";
 
-const INITIAL_MAZE_SIZE = 11;
+const INITIAL_MAZE_SIZE = 13;
+const MAX_MAZE_SIZE = 201;
 
 export const GameState = Object.freeze({
   START: 0,
@@ -53,7 +54,11 @@ export default class MazeGame {
   }
 
   startGame() {
-    this.maze = new Maze(INITIAL_MAZE_SIZE + this.player.mazesCompleted * 2);
+    const nextMazeSize = Math.min(
+      MAX_MAZE_SIZE,
+      INITIAL_MAZE_SIZE + this.player.mazesCompleted * 4,
+    );
+    this.maze = new Maze(nextMazeSize);
     this.inputHandler.reset();
     this.player.resetPosition();
     this.gameState = GameState.IN_GAME;
