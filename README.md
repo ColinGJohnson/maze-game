@@ -1,6 +1,6 @@
 # maze-game
 
-![License](https://img.shields.io/github/license/ColinGJohnson/nbody-2d)
+![License](https://img.shields.io/github/license/ColinGJohnson/maze-game)
 ![Deployment Status](https://img.shields.io/github/deployments/ColinGJohnson/maze-game/github-pages?label=deploy)
 
 A JavaScript browser game in which the player successively completes increasingly large randomly generated mazes. 
