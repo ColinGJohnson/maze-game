@@ -47,20 +47,8 @@ export default class MazeGame {
    */
   updateMenu() {
     if (this.inputHandler.pressed(Key.SPACE)) {
-      this.startGame();
+      this.#startGame();
     }
-  }
-
-  startGame() {
-    const nextMazeSize = Math.min(
-      MAX_MAZE_SIZE,
-      this.initialMazeSize + this.player.mazesCompleted * 4,
-    );
-    this.maze = new Maze(nextMazeSize);
-    this.inputHandler.reset();
-    this.player.resetPosition();
-    this.gameState = GameState.IN_GAME;
-    this.gameStartTimestamp = new Date().getTime();
   }
 
   /**
@@ -68,7 +56,7 @@ export default class MazeGame {
    * and handling input.
    */
   updateGame() {
-    this.checkWinCondition();
+    this.#checkWinCondition();
 
     if (this.inputHandler.pressed(Key.RIGHT) || this.inputHandler.pressed(Key.D)) {
       this.tryMove(1, 0);
@@ -113,10 +101,22 @@ export default class MazeGame {
     }
   }
 
+  #startGame() {
+    const nextMazeSize = Math.min(
+      MAX_MAZE_SIZE,
+      this.initialMazeSize + this.player.mazesCompleted * 4,
+    );
+    this.maze = new Maze(nextMazeSize);
+    this.inputHandler.reset();
+    this.player.resetPosition();
+    this.gameState = GameState.IN_GAME;
+    this.gameStartTimestamp = new Date().getTime();
+  }
+
   /**
    * Checks if the player has reached the goal and updates game state accordingly.
    */
-  checkWinCondition() {
+  #checkWinCondition() {
     if (this.maze.get(this.player.x, this.player.y) === GOAL) {
       this.gameState = GameState.END;
       this.gameEndTimestamp = new Date().getTime();
