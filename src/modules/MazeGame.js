@@ -1,9 +1,6 @@
 import Maze, { GOAL, WALL } from "./Maze.js";
-import MazeRenderer from "./MazeRenderer.js";
-import Player from "./Player.js";
-import InputHandler, { Key } from "./InputHandler.js";
+import { Key } from "./InputHandler.js";
 
-const INITIAL_MAZE_SIZE = 13;
 const MAX_MAZE_SIZE = 201;
 
 export const GameState = Object.freeze({
@@ -16,15 +13,16 @@ export default class MazeGame {
   gameState = GameState.START;
   gameStartTimestamp = 0;
   gameEndTimestamp = 0;
-  maze = new Maze(INITIAL_MAZE_SIZE);
-  mazeRenderer = new MazeRenderer("maze");
-  player = new Player();
-  inputHandler = new InputHandler();
 
-  /**
-   * Starts the game loop.
-   */
-  constructor() {
+  constructor(player, maze, mazeRenderer, inputHandler) {
+    this.player = player;
+    this.maze = maze;
+    this.mazeRenderer = mazeRenderer;
+    this.inputHandler = inputHandler;
+    this.initialMazeSize = maze.size;
+  }
+
+  play() {
     window.requestAnimationFrame(() => this.step());
   }
 
@@ -56,7 +54,7 @@ export default class MazeGame {
   startGame() {
     const nextMazeSize = Math.min(
       MAX_MAZE_SIZE,
-      INITIAL_MAZE_SIZE + this.player.mazesCompleted * 4,
+      this.initialMazeSize + this.player.mazesCompleted * 4,
     );
     this.maze = new Maze(nextMazeSize);
     this.inputHandler.reset();
@@ -66,7 +64,8 @@ export default class MazeGame {
   }
 
   /**
-   * Updates the game state by checking win conditions, processing player movement, and handling input.
+   * Updates the game state by checking win conditions, processing player movement,
+   * and handling input.
    */
   updateGame() {
     this.checkWinCondition();
@@ -90,6 +89,14 @@ export default class MazeGame {
     this.inputHandler.reset();
   }
 
+  /**
+   * Attempts to move the player in the specified direction within the maze. The player
+   * continues moving along the provided direction until a wall is encountered or a junction
+   * (with open paths) is reached.
+   *
+   * @param {number} x - The x-direction movement. Positive values for right, negative for left.
+   * @param {number} y - The y-direction movement. Positive values for down, negative for up.
+   */
   tryMove(x, y) {
     while (this.maze.get(this.player.x + x, this.player.y + y) !== WALL) {
       this.maze.visit(this.player);
